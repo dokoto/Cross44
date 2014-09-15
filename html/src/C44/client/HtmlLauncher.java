@@ -5,15 +5,18 @@ import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
 import C44.Cross44;
 
-public class HtmlLauncher extends GwtApplication {
+public class HtmlLauncher extends GwtApplication
+{
 
-        @Override
-        public GwtApplicationConfiguration getConfig () {
-                return new GwtApplicationConfiguration(1280, 780);
-        }
+	@Override
+	public GwtApplicationConfiguration getConfig()
+	{
+		return new GwtApplicationConfiguration(C44.Cross44.SCREEN_WIDTH, C44.Cross44.SCREEN_HEIGHT);
+	}
 
-        @Override
-        public ApplicationListener getApplicationListener () {
-                return new Cross44();
-        }
+	@Override
+	public ApplicationListener getApplicationListener()
+	{
+		return new Cross44();
+	}
 }

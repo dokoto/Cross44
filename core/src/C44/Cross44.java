@@ -1,5 +1,7 @@
 package C44;
 
+import java.util.ArrayList;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
@@ -19,12 +21,16 @@ public class Cross44 extends ApplicationAdapter
 	private OrthographicCamera camera;
 	private World physicsWorld;
 	Box2DDebugRenderer physicsDebugRenderer;
+	public static final int SCREEN_WIDTH = 1280;
+	public static final int SCREEN_HEIGHT = 780;
+	public static final int CAMERA_WIDTH = 800;
+	public static final int CAMERA_HEIGHT = 480;
 
 	@Override
 	public void create()
 	{
 		camera = new OrthographicCamera();
-		camera.setToOrtho(false, 800, 480);
+		camera.setToOrtho(false, CAMERA_WIDTH, CAMERA_HEIGHT);
 		physicsWorld = new World(new Vector2(0, -10), true);
 		physicsDebugRenderer = new Box2DDebugRenderer();
 		test_createPhysicsObjects();
@@ -51,13 +57,16 @@ public class Cross44 extends ApplicationAdapter
 		BodyDef bodyDef = new BodyDef();
 		Body edge = physicsWorld.createBody(bodyDef);
 		
-		Vector2 sides[] = new Vector2[2];
-		int index = 0;
-		sides[index++] = new Vector2(0.0f, 400.0f);
-		sides[index++] = new Vector2(600.0f, 10.0f);
+		ArrayList<Vector2> sides = new ArrayList<Vector2>();
+
+		sides.add( new Vector2(0.0f, 400.0f) );
+		sides.add( new Vector2(200.0f, 350.0f) );
+		sides.add( new Vector2(400.0f, 460.0f) );
+		sides.add( new Vector2(600.0f, 250.0f) );
+		sides.add( new Vector2(1200.0f, 50.0f) );
 	
 		ChainShape chain = new ChainShape();
-		chain.createChain(sides);
+		chain.createChain(sides.toArray(new Vector2[sides.size()]));
 		
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = chain;
@@ -100,7 +109,7 @@ public class Cross44 extends ApplicationAdapter
 		Body body = physicsWorld.createBody(bodyDef);
 		
 		CircleShape circle = new CircleShape();
-		circle.setRadius(6f);
+		circle.setRadius(6.0f);
 		
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = circle;
