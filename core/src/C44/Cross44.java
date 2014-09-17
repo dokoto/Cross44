@@ -2,6 +2,8 @@ package C44;
 
 import java.util.ArrayList;
 
+import C44.utils.primitives.Curve;
+
 import com.apple.eawt.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
@@ -26,16 +28,24 @@ public class Cross44 extends ApplicationAdapter
 	private OrthographicCamera camera;
 	private World physicsWorld;
 	private Box2DDebugRenderer physicsDebugRenderer;
+	
+	private Body chassis, leftBodyWheel, rightBodyWheel;
+	private FixtureDef chassisFixtureDef;
+	private FixtureDef wheelFixtureDef;
+	private WheelJoint leftWheel, rightWheel;
+	private Body motorcycle;
+	private final static float SPEED = 75.0f;
 
 	public static final int SCREEN_WIDTH = 1280;
 	public static final int SCREEN_HEIGHT = 780;
 	public static final int CAMERA_WIDTH = 800;
 	public static final int CAMERA_HEIGHT = 480;
+	public static final int CAMERA_DISTANCE = 2;
 
 	@Override
 	public void create()
 	{
-		camera = new OrthographicCamera(Gdx.graphics.getWidth() / 25, Gdx.graphics.getHeight() / 25);				
+		camera = new OrthographicCamera(Gdx.graphics.getWidth() / CAMERA_DISTANCE, Gdx.graphics.getHeight() / CAMERA_DISTANCE);				
 		physicsWorld = new World(new Vector2(0, -10), true);
 		physicsDebugRenderer = new Box2DDebugRenderer();
 		test_createPhysicsObjects();
@@ -44,8 +54,8 @@ public class Cross44 extends ApplicationAdapter
 	@Override
 	public void resize(int width, int height)
 	{
-		camera.viewportWidth = SCREEN_WIDTH / 25;
-		camera.viewportHeight = SCREEN_HEIGHT / 25;
+		camera.viewportWidth = SCREEN_WIDTH / CAMERA_DISTANCE;
+		camera.viewportHeight = SCREEN_HEIGHT / CAMERA_DISTANCE;
 	}
 
 	@Override
@@ -65,30 +75,45 @@ public class Cross44 extends ApplicationAdapter
 	{
 		test_createPhysicsWorldBundaries();
 		test_createPhysicsGround();
-		test_createPhysicsPlayer(5.0f, 405.0f);
+		test_createPhysicsPlayer(5.0f, 55.0f);
 	}
 
 	private void test_handleKeyBoardInput()
 	{
-		if (Gdx.input.isKeyPressed(Keys.A) == true)
-		{
-			leftWheel.enableMotor(true);
-			leftWheel.setMotorSpeed(SPEED);
-
-		} else if (Gdx.input.isKeyPressed(Keys.S) == true)
+		if (Gdx.input.isKeyPressed(Keys.S) == true) // BREAK
 		{
 			leftWheel.enableMotor(true);
 			leftWheel.setMotorSpeed(0.0f);
-		} else if (Gdx.input.isKeyPressed(Keys.D) == true)
+			leftBodyWheel.setLinearVelocity(0.0f, 0.0f);
+			rightBodyWheel.setLinearVelocity(0.0f, 0.0f);
+		} 
+		else if (Gdx.input.isKeyPressed(Keys.D) == true) // ACCELERATOR
 		{
 			leftWheel.enableMotor(true);
-			leftWheel.setMotorSpeed(-SPEED);
-		} else if (Gdx.input.isKeyPressed(Keys.SPACE) == true)
+			leftWheel.setMotorSpeed(-SPEED);	
+		} 
+		else if (Gdx.input.isKeyPressed(Keys.UP) == true)
 		{
-			// motorcycle.setLinearVelocity(new Vector2(200.0f, 0.0f));
-		} else if (Gdx.input.isKeyPressed(Keys.ESCAPE) == true)
+			rightBodyWheel.setLinearVelocity(0.0f, 10.0f);
+		}
+		else if (Gdx.input.isKeyPressed(Keys.DOWN) == true)
+		{
+			rightBodyWheel.setLinearVelocity(0.0f, -10.0f);
+		}
+		else if (Gdx.input.isKeyPressed(Keys.SPACE) == true)
+		{
+			chassis.setLinearVelocity(100.0f, 0.0f);
+			leftBodyWheel.setLinearVelocity(100.0f, 0.0f);
+			rightBodyWheel.setLinearVelocity(100.0f, 0.0f);
+		} 
+		else if (Gdx.input.isKeyPressed(Keys.ESCAPE) == true)
 		{
 			Gdx.app.exit();
+		}
+		else
+		{
+			leftWheel.enableMotor(true);
+			leftWheel.setMotorSpeed(-leftWheel.getMotorSpeed());
 		}
 	}
 
@@ -96,25 +121,63 @@ public class Cross44 extends ApplicationAdapter
 	{
 		BodyDef bodyDef = new BodyDef();
 		Body edge = physicsWorld.createBody(bodyDef);
-
+	
 		ArrayList<Vector2> sides = new ArrayList<Vector2>();
 
-		sides.add(new Vector2(0.0f, 400.0f));
-		sides.add(new Vector2(200.0f, 390.0f));
-		sides.add(new Vector2(390.0f, 420.0f));
-		sides.add(new Vector2(600.0f, 250.0f));
+		sides.add(new Vector2(0.0f, 50.0f));
+		sides.add(new Vector2(150.0f, 50.0f));
+		sides.add(new Vector2(390.0f, 52.0f));
+		sides.add(new Vector2(600.0f, 25.0f));
 		sides.add(new Vector2(1200.0f, 50.0f));
-
+		
+		
 		ChainShape chain = new ChainShape();
 		chain.createChain(sides.toArray(new Vector2[sides.size()]));
 
 		FixtureDef fixtureDef = new FixtureDef();
 		fixtureDef.shape = chain;
-		fixtureDef.density = 0.5f;
+		fixtureDef.density = 10000.5f;
+		fixtureDef.friction = 100.0f;
 
 		edge.createFixture(fixtureDef);
+			
+		chain.dispose();
+		test_createPhysicsGroundLoop();
+	}
+	
+	private void test_createPhysicsGroundLoop()
+	{
+		BodyDef bodyDef = new BodyDef();
+		Body edge = physicsWorld.createBody(bodyDef);
+
+		/*
+		ArrayList<Vector2> sides = new ArrayList<Vector2>();
+
+		sides.add(new Vector2(200.0f, 400.0f));
+		sides.add(new Vector2(220.0f, 440.0f));
+		sides.add(new Vector2(220.0f, 460.0f));
+		sides.add(new Vector2(200.0f, 480.0f));
+		sides.add(new Vector2(180.0f, 480.0f));
+		sides.add(new Vector2(160.0f, 460.0f));
+		sides.add(new Vector2(160.0f, 440.0f));
+		sides.add(new Vector2(180.0f, 420.0f));
+*/
+		ArrayList<Vector2> sides = Curve.generateCurve(new Vector2(200.0f, 100.0f), 30.0f, 20.0f, 5.0f);
+		//sides.addAll( Curve.generateCurve(new Vector2(150.0f, 55.0f), new Vector2(150.0f, 75.0f), 20.0f, 1.0f) );
+		ChainShape chain = new ChainShape();
+		chain.createChain(sides.toArray(new Vector2[sides.size()]));
+
+		FixtureDef fixtureDef = new FixtureDef();
+		fixtureDef.shape = chain;
+		fixtureDef.density = 10000.5f;
+		fixtureDef.friction = 100.0f;
+
+		edge.createFixture(fixtureDef);
+				
 		chain.dispose();
 	}
+	
+	
 
 	private void test_createPhysicsWorldBundaries()
 	{
@@ -155,16 +218,8 @@ public class Cross44 extends ApplicationAdapter
 		test_createPhysicsPlayer(x_pos, y_pos, DEFAULT_RADIUS, DEFAULT_FRAME_WIDTH, DEFAULT_FRAME_HEIGHT);
 	}
 
-	private Body chassis, leftBodyWheel, rightBodyWheel;
-	private FixtureDef chassisFixtureDef;
-	private FixtureDef wheelFixtureDef;
-	private WheelJoint leftWheel, rightWheel;
-	private Body motorcycle;
-	private final static float SPEED = 75.0f;
-
-	private void test_createPhysicsPlayer(float x_pos, float y_pos, float radius, float frame_width, float frame_height)
+	private void test_createPhysicsPlayer2(float x_pos, float y_pos, float radius, float frame_width, float frame_height)
 	{
-
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
 		bodyDef.position.set(x_pos, y_pos);
@@ -189,7 +244,7 @@ public class Cross44 extends ApplicationAdapter
 
 		wheelFixtureDef = new FixtureDef();
 		wheelFixtureDef.density = chassisFixtureDef.density - 0.5f;
-		wheelFixtureDef.friction = 1.0f;
+		wheelFixtureDef.friction = 2.0f;
 		wheelFixtureDef.restitution = 0.4f;
 		wheelFixtureDef.shape = wheelShape;
 
@@ -216,57 +271,58 @@ public class Cross44 extends ApplicationAdapter
 
 	}
 
-	private void test_createPhysicsPlayer2(float x_pos, float y_pos, float radius, float frame_width, float frame_height)
+	private void test_createPhysicsPlayer(float x_pos, float y_pos, float radius, float frame_width, float frame_height)
 	{
-		final float HZ = 4.0f;
-		final float ZETA = 0.7f;
-
-		PolygonShape chassisShape = new PolygonShape();
-		chassisShape.setAsBox(frame_width, frame_height);
-
-		CircleShape circle = new CircleShape();
-		circle.setRadius(radius);
-
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
-		bodyDef.position.set(x_pos, y_pos);
+		bodyDef.position.set(10.0f, 55.0f);
+
+		// CHASSIS
+		PolygonShape chassisShape = new PolygonShape();
+		chassisShape.setAsBox(2.0f, 1.8f);
+		
+		chassisFixtureDef = new FixtureDef();
+		chassisFixtureDef.density = 10.0f;
+		chassisFixtureDef.friction = 0.2f;
+		chassisFixtureDef.restitution = 0.1f;
+		chassisFixtureDef.shape = chassisShape;
+
 		chassis = physicsWorld.createBody(bodyDef);
-		chassis.createFixture(chassisShape, 1.0f);
+		chassis.createFixture(chassisFixtureDef);
 
-		FixtureDef fixtureDef = new FixtureDef();
-		fixtureDef.shape = circle;
-		fixtureDef.density = 1.0f;
-		fixtureDef.friction = 0.9f;
+		// LEFT WHEEL
+		CircleShape wheelShape = new CircleShape();
+		wheelShape.setRadius(1.7f);
 
-		bodyDef.position.set(x_pos - 2.5f, y_pos - 1.25f);
-		Body left_wheel = physicsWorld.createBody(bodyDef);
-		left_wheel.createFixture(fixtureDef);
+		wheelFixtureDef = new FixtureDef();
+		wheelFixtureDef.density = chassisFixtureDef.density - 0.5f;
+		wheelFixtureDef.friction = 80.0f;
+		wheelFixtureDef.restitution = 0.1f;
+		wheelFixtureDef.shape = wheelShape;
 
-		bodyDef.position.set(x_pos + 2.5f, y_pos - 1.25f);
-		Body right_wheel = physicsWorld.createBody(bodyDef);
-		right_wheel.createFixture(fixtureDef);
+		leftBodyWheel = physicsWorld.createBody(bodyDef);
+		leftBodyWheel.createFixture(wheelFixtureDef);
+
+		rightBodyWheel = physicsWorld.createBody(bodyDef);
+		rightBodyWheel.createFixture(wheelFixtureDef);
 
 		WheelJointDef wheelJoinDef = new WheelJointDef();
-		Vector2 axis = new Vector2(0.0f, 1.0f);
-
-		wheelJoinDef.initialize(motorcycle, left_wheel, left_wheel.getPosition(), axis);
-		wheelJoinDef.motorSpeed = 0.0f;
-		wheelJoinDef.maxMotorTorque = 100.0f;
-		wheelJoinDef.enableMotor = true;
-		wheelJoinDef.frequencyHz = HZ;
-		wheelJoinDef.dampingRatio = ZETA;
+		wheelJoinDef.bodyA = chassis;
+		wheelJoinDef.bodyB = leftBodyWheel;
+		wheelJoinDef.localAnchorA.set(-3.2f, -2.2f);
+		wheelJoinDef.frequencyHz = chassisFixtureDef.density;
+		wheelJoinDef.localAxisA.set(Vector2.Y);
+		wheelJoinDef.maxMotorTorque = chassisFixtureDef.density * 700;
 		leftWheel = (WheelJoint) physicsWorld.createJoint(wheelJoinDef);
 
-		wheelJoinDef.initialize(motorcycle, right_wheel, right_wheel.getPosition(), axis);
-		wheelJoinDef.motorSpeed = 0.0f;
-		wheelJoinDef.maxMotorTorque = 100.0f;
-		wheelJoinDef.enableMotor = true;
-		wheelJoinDef.frequencyHz = HZ;
-		wheelJoinDef.dampingRatio = ZETA;
+		// right axis
+		wheelJoinDef.bodyB = rightBodyWheel;
+		wheelJoinDef.localAnchorA.x *= -1;
+
 		rightWheel = (WheelJoint) physicsWorld.createJoint(wheelJoinDef);
 
 		chassisShape.dispose();
-		circle.dispose();
+		wheelShape.dispose();
 	}
 
 }
