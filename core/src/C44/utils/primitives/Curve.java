@@ -20,6 +20,6 @@ public class Curve
 		
 		return curve;		
 	}
-	
+		
 
 }

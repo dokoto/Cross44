@@ -125,9 +125,9 @@ public class Cross44 extends ApplicationAdapter
 
 		if (Gdx.input.isKeyPressed(Keys.S) == true) // TURBO
 		{
-			chassis.setLinearVelocity(100.0f, 0.0f);
-			leftBodyWheel.setLinearVelocity(100.0f, 0.0f);
-			rightBodyWheel.setLinearVelocity(100.0f, 0.0f);
+			chassis.setLinearVelocity(100.0f, chassis.getAngularVelocity());
+			leftBodyWheel.setLinearVelocity(100.0f, chassis.getAngularVelocity());
+			rightBodyWheel.setLinearVelocity(100.0f, chassis.getAngularVelocity());
 			keyPressed = true;
 		}
 
@@ -190,7 +190,7 @@ public class Cross44 extends ApplicationAdapter
 		BodyDef bodyDef = new BodyDef();
 		Body edge = physicsWorld.createBody(bodyDef);
 
-		ArrayList<Vector2> sides = Curve.generateCurve(new Vector2(200.0f, 100.0f), 30.0f, 20.0f, 5.0f);
+		ArrayList<Vector2> sides = Curve.generateCurve(new Vector2(200.0f, 50.0f), 30.0f, 40.0f, 1.0f);
 		// sides.addAll( Curve.generateCurve(new Vector2(150.0f, 55.0f), new
 		// Vector2(150.0f, 75.0f), 20.0f, 1.0f) );
 		ChainShape chain = new ChainShape();
