@@ -1,13 +1,15 @@
-package C44;
+package cross;
 
 import java.util.ArrayList;
 
+import C44.utils.inputs.gestureHandler;
 import C44.utils.primitives.Curve;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.input.GestureDetector;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -96,6 +98,7 @@ public class Cross44 extends ApplicationAdapter
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		test_handleKeyBoardInput();
+		Gdx.input.setInputProcessor(new GestureDetector(new gestureHandler()));
 		physicsDebugRenderer.render(physicsWorld, camera.combined);
 		camera.position.x = chassis.getPosition().x;
 		camera.position.y = chassis.getPosition().y;

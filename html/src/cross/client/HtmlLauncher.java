@@ -1,9 +1,10 @@
-package C44.client;
+package cross.client;
+
+import cross.Cross44;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.backends.gwt.GwtApplication;
 import com.badlogic.gdx.backends.gwt.GwtApplicationConfiguration;
-import C44.Cross44;
 
 public class HtmlLauncher extends GwtApplication
 {
@@ -11,7 +12,7 @@ public class HtmlLauncher extends GwtApplication
 	@Override
 	public GwtApplicationConfiguration getConfig()
 	{
-		return new GwtApplicationConfiguration(C44.Cross44.Consts.SCREEN_WIDTH, C44.Cross44.Consts.SCREEN_HEIGHT);
+		return new GwtApplicationConfiguration(cross.Cross44.Consts.SCREEN_WIDTH, cross.Cross44.Consts.SCREEN_HEIGHT);
 	}
 
 	@Override

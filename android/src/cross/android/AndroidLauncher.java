@@ -1,10 +1,11 @@
-package C44.android;
+package cross.android;
 
 import android.os.Bundle;
 
+import cross.Cross44;
+
 import com.badlogic.gdx.backends.android.AndroidApplication;
 import com.badlogic.gdx.backends.android.AndroidApplicationConfiguration;
-import C44.Cross44;
 
 public class AndroidLauncher extends AndroidApplication
 {

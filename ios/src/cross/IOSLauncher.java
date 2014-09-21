@@ -1,11 +1,12 @@
-package C44;
+package cross;
 
 import org.robovm.apple.foundation.NSAutoreleasePool;
 import org.robovm.apple.uikit.UIApplication;
 
+import cross.Cross44;
+
 import com.badlogic.gdx.backends.iosrobovm.IOSApplication;
 import com.badlogic.gdx.backends.iosrobovm.IOSApplicationConfiguration;
-import C44.Cross44;
 
 public class IOSLauncher extends IOSApplication.Delegate {
     @Override

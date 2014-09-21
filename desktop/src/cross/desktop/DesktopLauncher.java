@@ -1,8 +1,9 @@
-package C44.desktop;
+package cross.desktop;
+
+import cross.Cross44;
 
 import com.badlogic.gdx.backends.lwjgl.LwjglApplication;
 import com.badlogic.gdx.backends.lwjgl.LwjglApplicationConfiguration;
-import C44.Cross44;
 
 public class DesktopLauncher
 {
@@ -11,8 +12,8 @@ public class DesktopLauncher
 		LwjglApplicationConfiguration config = new LwjglApplicationConfiguration();
 
 		config.title = "Cross44";
-		config.width = C44.Cross44.Consts.SCREEN_WIDTH;
-		config.height = C44.Cross44.Consts.SCREEN_HEIGHT;
+		config.width = cross.Cross44.Consts.SCREEN_WIDTH;
+		config.height = cross.Cross44.Consts.SCREEN_HEIGHT;
 		config.vSyncEnabled = true;
 
 		new LwjglApplication(new Cross44(), config);
