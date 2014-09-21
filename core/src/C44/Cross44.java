@@ -3,8 +3,6 @@ package C44;
 import java.util.ArrayList;
 
 import C44.utils.primitives.Curve;
-
-import com.apple.eawt.Application;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -40,12 +38,12 @@ public class Cross44 extends ApplicationAdapter
 	
 	public static class Consts
 	{
-		public final static float SPEED = 225.0f;	
+		public final static float SPEED = 225.0f;		
 		public static final int SCREEN_WIDTH = 1280;
 		public static final int SCREEN_HEIGHT = 780;
 		public static final int CAMERA_WIDTH = 800;
 		public static final int CAMERA_HEIGHT = 480;
-		public static final int CAMERA_DISTANCE = 10;
+		public static final int CAMERA_DISTANCE = 5;
 		public static final boolean GRAVITY_ON = true;
 		public final static float TIME_STEP = 1.0f / 60.0f;
 		public final static int VELOCITY_ITERATIONS = 6;
@@ -190,9 +188,8 @@ public class Cross44 extends ApplicationAdapter
 		BodyDef bodyDef = new BodyDef();
 		Body edge = physicsWorld.createBody(bodyDef);
 
-		ArrayList<Vector2> sides = Curve.generateCurve(new Vector2(200.0f, 100.0f), 30.0f, 20.0f, 5.0f);
-		// sides.addAll( Curve.generateCurve(new Vector2(150.0f, 55.0f), new
-		// Vector2(150.0f, 75.0f), 20.0f, 1.0f) );
+		//ArrayList<Vector2> sides = Curve.generateCurve(new Vector2(100f, 200.0f), new Vector2(200f, 150.0f), 100.0f, 7.0f, false, false);
+		ArrayList<Vector2> sides = Curve.generateCurve(new Vector2(360f, 100.0f), new Vector2(400f, 75.0f), 80.0f, 7.0f, false, false);
 		ChainShape chain = new ChainShape();
 		chain.createChain(sides.toArray(new Vector2[sides.size()]));
 
@@ -213,10 +210,10 @@ public class Cross44 extends ApplicationAdapter
 
 		ArrayList<Vector2> sides = new ArrayList<Vector2>();
 
-		sides.add(new Vector2(50.0f, 50.0f));
-		sides.add(new Vector2(75.0f, 75.0f));
-		sides.add(new Vector2(100.0f, 50.0f));
-		sides.add(new Vector2(50.0f, 50.0f));
+		sides.add(new Vector2(350.0f, 50.0f));
+		sides.add(new Vector2(375.0f, 75.0f));
+		sides.add(new Vector2(400.0f, 50.0f));
+		sides.add(new Vector2(350.0f, 50.0f));
 
 		ChainShape chain = new ChainShape();
 		chain.createChain(sides.toArray(new Vector2[sides.size()]));
