@@ -123,9 +123,9 @@ public class Cross44 extends ApplicationAdapter
 
 		if (Gdx.input.isKeyPressed(Keys.S) == true) // TURBO
 		{
-			chassis.setLinearVelocity(100.0f, 0.0f);
-			leftBodyWheel.setLinearVelocity(100.0f, 0.0f);
-			rightBodyWheel.setLinearVelocity(100.0f, 0.0f);
+			chassis.setLinearVelocity(100.0f, chassis.getAngularVelocity());
+			leftBodyWheel.setLinearVelocity(100.0f, chassis.getAngularVelocity());
+			rightBodyWheel.setLinearVelocity(100.0f, chassis.getAngularVelocity());
 			keyPressed = true;
 		}
 
