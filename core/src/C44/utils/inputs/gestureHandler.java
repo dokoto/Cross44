@@ -1,79 +1,120 @@
 package C44.utils.inputs;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
 
-public class gestureHandler implements GestureListener {
-	
+import cross.Cross44;
+import cross.Cross44.Consts;
+
+public class gestureHandler implements InputProcessor
+{
+	private static final float MARGIN_WIDTH = 300.0f;
+	private Cross44 cross;
+
+	public gestureHandler(Cross44 cross)
+	{
+		this.cross = cross;
+	}
+
 	@Override
-	public boolean touchDown(float x, float y, int pointer, int button) {
-		if (x >= 0.0f && x <= 50.0f)
+	public boolean keyDown(int keycode)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyUp(int keycode)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean keyTyped(char character)
+	{
+		// TODO Auto-generated method stub
+		return false;
+	}
+
+	@Override
+	public boolean touchDown(int x, int y, int pointer, int button)
+	{
+		if (x >= 0.0f && x <= MARGIN_WIDTH)
 		{
-			if(y >= 0.0f && y <= 300.0f) // TURBO
+			if (y >= 0.0f && y <= Gdx.graphics.getHeight() / 2)
 			{
-				Gdx.app.log("GESTURES", "TURBO");
+				Gdx.app.log("TOUCH-DOWN", "ACELERANDO");
+				cross.currentMovement = Cross44.Moves.ACCELERAR;
+			} else
+			{
+				Gdx.app.log("TOUCH-DOWN", "TURBO");
+				cross.currentMovement = Cross44.Moves.TURBO;
 			}
-			else // ACELERAR
+		} else if (x >= Gdx.graphics.getWidth() - MARGIN_WIDTH && x <= Gdx.graphics.getWidth())
+		{
+			if (y >= 0.0f && y <= Gdx.graphics.getHeight() / 2)
 			{
-				Gdx.app.log("GESTURES", "ACELERANDO");
+				Gdx.app.log("TOUCH-DOWN", "ESTABILIZA ARRIBA");
+				cross.currentMovement = Cross44.Moves.ESTABILIZA_ARRIBA;
+			} else
+			{
+				Gdx.app.log("TOUCH-DOWN", "ESTABILIZA ABAJO");
+				cross.currentMovement = Cross44.Moves.ESTABILIZA_ABAJO;
 			}
 		}
-		if (x >= 1230.0f && x <= 1280.0f)
+		return false;
+	}
+
+	@Override
+	public boolean touchUp(int x, int y, int pointer, int button)
+	{
+		if (x >= 0.0f && x <= MARGIN_WIDTH)
 		{
-			if(y >= 0.0f && y <= 300.0f) // ESTABILIZA MORRO HACIA ABAJO
+			if (y >= 0.0f && y <= Gdx.graphics.getHeight() / 2)
 			{
-				Gdx.app.log("GESTURES", "ESTABILIZA ABAJO");
+				Gdx.app.log("TOUCH-UP", "PARO-ACELERANDO");
+				cross.currentMovement = Cross44.Moves.STOP;
+			} else
+			{
+				Gdx.app.log("TOUCH-DOWN", "CONTINUA-TURBO-HASTA-ACABAR");
+				cross.currentMovement = Cross44.Moves.CONTINUA_MOV;
 			}
-			else // // ESTABILIZA MORRO HACIA ARRIBA
+		} else if (x >= Gdx.graphics.getWidth() - MARGIN_WIDTH && x <= Gdx.graphics.getWidth())
+		{
+			if (y >= 0.0f && y <= Gdx.graphics.getHeight() / 2)
 			{
-				Gdx.app.log("GESTURES", "ESTABILIZA ARRIBA");
+				Gdx.app.log("TOUCH-UP", "PARO-ESTABILIZA ARRIBA");
+				cross.currentMovement = Cross44.Moves.STOP;
+			} else
+			{
+				Gdx.app.log("TOUCH-UP", "PARO-ESTABILIZA ABAJO");
+				cross.currentMovement = Cross44.Moves.STOP;
 			}
 		}
 		return false;
 	}
 
 	@Override
-	public boolean tap(float x, float y, int count, int button) {
-
+	public boolean touchDragged(int screenX, int screenY, int pointer)
+	{
+		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean longPress(float x, float y) {
-
+	public boolean mouseMoved(int screenX, int screenY)
+	{
+		// TODO Auto-generated method stub
 		return false;
 	}
 
 	@Override
-	public boolean fling(float velocityX, float velocityY, int button) {
-
-		return false;
-	}
-
-	@Override
-	public boolean pan(float x, float y, float deltaX, float deltaY) {
-
-		return false;
-	}
-
-	@Override
-	public boolean panStop(float x, float y, int pointer, int button) {
-
-		return false;
-	}
-
-	@Override
-	public boolean zoom(float originalDistance, float currentDistance) {
-
-		return false;
-	}
-
-	@Override
-	public boolean pinch(Vector2 initialFirstPointer,
-			Vector2 initialSecondPointer, Vector2 firstPointer,
-			Vector2 secondPointer) {
-
+	public boolean scrolled(int amount)
+	{
+		// TODO Auto-generated method stub
 		return false;
 	}
 

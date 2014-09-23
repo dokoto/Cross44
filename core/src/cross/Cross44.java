@@ -26,13 +26,16 @@ import com.badlogic.gdx.utils.TimeUtils;
 
 public class Cross44 extends ApplicationAdapter
 {
-	private OrthographicCamera camera;
-	private World physicsWorld;
-	private Box2DDebugRenderer physicsDebugRenderer;
-	private Body chassis, leftBodyWheel, rightBodyWheel;
-	private FixtureDef chassisFixtureDef;
-	private FixtureDef wheelFixtureDef;
-	private WheelJoint leftWheel, rightWheel;
+	
+	public enum Moves {ACCELERAR, TURBO, ESTABILIZA_ARRIBA, ESTABILIZA_ABAJO, CONTINUA_MOV, STOP};
+	public Moves currentMovement = Moves.STOP;
+	public OrthographicCamera camera;
+	public World physicsWorld;
+	public Box2DDebugRenderer physicsDebugRenderer;
+	public Body chassis, leftBodyWheel, rightBodyWheel;
+	public FixtureDef chassisFixtureDef;
+	public FixtureDef wheelFixtureDef;
+	public WheelJoint leftWheel, rightWheel;
 	private float accumulator = 0;
 	private double currentTime = 0;	
 
@@ -45,7 +48,7 @@ public class Cross44 extends ApplicationAdapter
 		public static final int SCREEN_HEIGHT = 780;
 		public static final int CAMERA_WIDTH = 800;
 		public static final int CAMERA_HEIGHT = 480;
-		public static final int CAMERA_DISTANCE = 5;
+		public static final int CAMERA_DISTANCE = 15;
 		public static final boolean GRAVITY_ON = true;
 		public final static float TIME_STEP = 1.0f / 60.0f;
 		public final static int VELOCITY_ITERATIONS = 6;
@@ -60,6 +63,7 @@ public class Cross44 extends ApplicationAdapter
 		physicsWorld = (Consts.GRAVITY_ON) ? new World(new Vector2(0, Consts.GRAVITY), true) : new World(new Vector2(0, 0.0f), true);		
 		physicsDebugRenderer = new Box2DDebugRenderer();
 		test_createPhysicsObjects();
+		Gdx.input.setInputProcessor(new gestureHandler(this));
 	}
 
 	@Override
@@ -97,8 +101,8 @@ public class Cross44 extends ApplicationAdapter
 		float deltaTime = getDeltaTime();		
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		test_handleKeyBoardInput();
-		Gdx.input.setInputProcessor(new GestureDetector(new gestureHandler()));
+		test_handleKeyBoardInput();		
+		test_handleMovement(currentMovement);
 		physicsDebugRenderer.render(physicsWorld, camera.combined);
 		camera.position.x = chassis.getPosition().x;
 		camera.position.y = chassis.getPosition().y;
@@ -114,8 +118,42 @@ public class Cross44 extends ApplicationAdapter
 		test_createPhysicsPlayer(10.0f, 55.0f);
 	}
 
+	private void test_handleMovement(Moves movement)
+	{
+		if (movement == Moves.ACCELERAR)
+		{
+			leftWheel.enableMotor(true);
+			leftWheel.setMotorSpeed(-Consts.SPEED);
+		}
+		
+		if (movement == Moves.TURBO)
+		{
+			chassis.setLinearVelocity(100.0f, chassis.getAngularVelocity());
+			leftBodyWheel.setLinearVelocity(100.0f, chassis.getAngularVelocity());
+			rightBodyWheel.setLinearVelocity(100.0f, chassis.getAngularVelocity());				
+		}
+		
+		if (movement == Moves.ESTABILIZA_ARRIBA)
+		{
+			chassis.setAngularVelocity(3.0f);
+		}
+		
+		if (movement == Moves.ESTABILIZA_ABAJO)
+		{
+			chassis.setAngularVelocity(-3.0f);
+		}
+		
+		if (movement == Moves.STOP)
+		{
+			leftWheel.enableMotor(true);
+			leftWheel.setMotorSpeed(0.0f);
+			chassis.setAngularVelocity(0.0f);
+		}
+	}
+	
 	private void test_handleKeyBoardInput()
 	{
+		/*
 		boolean keyPressed = false;
 		if (Gdx.input.isKeyPressed(Keys.W) == true) // ACCELERATOR
 		{
@@ -143,19 +181,22 @@ public class Cross44 extends ApplicationAdapter
 			chassis.setAngularVelocity(-3.0f);
 			keyPressed = true;
 		}
-
-		if (Gdx.input.isKeyPressed(Keys.ESCAPE) == true)
-		{
-			Gdx.app.exit();
-			keyPressed = true;
-		}
-
+		
 		if (keyPressed == false) // BREAK
 		{
 			leftWheel.enableMotor(true);
 			leftWheel.setMotorSpeed(0.0f);
 			chassis.setAngularVelocity(0.0f);
 		}
+		
+		 */
+		if (Gdx.input.isKeyPressed(Keys.ESCAPE) == true)
+		{
+			Gdx.app.exit();
+			//keyPressed = true;
+		}
+
+		
 	}
 
 	private void test_createPhysicsGround()

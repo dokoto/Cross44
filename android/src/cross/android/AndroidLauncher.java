@@ -1,6 +1,7 @@
 package cross.android;
 
 import android.os.Bundle;
+import android.view.View;
 
 import cross.Cross44;
 
@@ -13,6 +14,11 @@ public class AndroidLauncher extends AndroidApplication
 	protected void onCreate(Bundle savedInstanceState)
 	{
 		super.onCreate(savedInstanceState);
+		
+		View decorView = getWindow().getDecorView(); 
+		int uiOptions = View.SYSTEM_UI_FLAG_HIDE_NAVIGATION | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY;
+		decorView.setSystemUiVisibility(uiOptions);
+		
 		AndroidApplicationConfiguration config = new AndroidApplicationConfiguration();
 		
 		config.useAccelerometer = false;
