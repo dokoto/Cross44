@@ -1,6 +1,7 @@
 package C44.utils.inputs;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.Vector2;
@@ -21,14 +22,65 @@ public class gestureHandler implements InputProcessor
 	@Override
 	public boolean keyDown(int keycode)
 	{
-		// TODO Auto-generated method stub
+		if (Keys.W == keycode)
+		{
+			Gdx.app.log("KEY-DOWN", "ACELERANDO");
+			cross.currentMovement = Cross44.Moves.ACCELERAR;
+		}
+		
+		if (Keys.S == keycode)
+		{
+			Gdx.app.log("KEY-DOWN", "TURBO");
+			cross.currentMovement = Cross44.Moves.TURBO;
+		}
+		
+		if (Keys.UP == keycode)
+		{
+			Gdx.app.log("KEY-DOWN", "ESTABILIZA_ARRIBA");
+			cross.currentMovement = Cross44.Moves.ESTABILIZA_ARRIBA;
+		}
+		
+		if (Keys.DOWN == keycode)
+		{
+			Gdx.app.log("KEY-DOWN", "ESTABILIZA_ABAJO");
+			cross.currentMovement = Cross44.Moves.ESTABILIZA_ABAJO;
+		}
+		
+		if (Keys.ESCAPE == keycode)
+		{
+			Gdx.app.exit();
+		}
+		
 		return false;
 	}
 
 	@Override
 	public boolean keyUp(int keycode)
 	{
-		// TODO Auto-generated method stub
+		if (Keys.W == keycode)
+		{
+			Gdx.app.log("KEY-DOWN", "STOP-ACELERANDO");
+			cross.currentMovement = Cross44.Moves.STOP;
+		}
+		
+		if (Keys.S == keycode)
+		{
+			Gdx.app.log("KEY-DOWN", "STOP-TURBO");
+			cross.currentMovement = Cross44.Moves.STOP;
+		}
+		
+		if (Keys.UP == keycode)
+		{
+			Gdx.app.log("KEY-DOWN", "STOP-ESTABILIZA_ARRIBA");
+			cross.currentMovement = Cross44.Moves.STOP;
+		}
+		
+		if (Keys.DOWN == keycode)
+		{
+			Gdx.app.log("KEY-DOWN", "STOP-ESTABILIZA_ABAJO");
+			cross.currentMovement = Cross44.Moves.STOP;
+		}
+		
 		return false;
 	}
 

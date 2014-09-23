@@ -101,7 +101,7 @@ public class Cross44 extends ApplicationAdapter
 		float deltaTime = getDeltaTime();		
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		test_handleKeyBoardInput();		
+		//test_handleKeyBoardInput();		
 		test_handleMovement(currentMovement);
 		physicsDebugRenderer.render(physicsWorld, camera.combined);
 		camera.position.x = chassis.getPosition().x;
