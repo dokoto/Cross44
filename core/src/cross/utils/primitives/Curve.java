@@ -1,5 +1,9 @@
-package C44.utils.primitives;
+package cross.utils.primitives;
 
+import java.awt.Shape;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Ellipse2D;
+import java.awt.geom.FlatteningPathIterator;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -7,6 +11,22 @@ import com.badlogic.gdx.math.Vector2;
 
 public class Curve
 {
+	// http://java-sl.com/tip_flatteningpathiterator_moving_shape.html
+	public static ArrayList<Vector2> generateCurve2()
+	{
+		ArrayList<Vector2> curve = new ArrayList<Vector2>();
+		Shape s = new Ellipse2D.Float(100, 55, 100, 100);
+		FlatteningPathIterator iter = new FlatteningPathIterator(s.getPathIterator(new AffineTransform()), 1);
+		float[] coords=new float[6];
+		while (!iter.isDone())
+		{
+			iter.currentSegment(coords);
+			curve.add(new Vector2((int)coords[0], (int)coords[1]));
+		}
+		
+		return curve;
+	}
+	
 	public static ArrayList<Vector2> generateCurve(Vector2 from, Vector2 to, float radius, float minDistance, boolean shortest, boolean side)
 	{
 		ArrayList<Vector2> curve = new ArrayList<Vector2>();	

@@ -2,9 +2,6 @@ package cross;
 
 import java.util.ArrayList;
 
-import C44.utils.inputs.GestureHandler;
-import C44.utils.inputs.InputHandler;
-import C44.utils.primitives.Curve;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
@@ -25,6 +22,10 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.joints.WheelJoint;
 import com.badlogic.gdx.physics.box2d.joints.WheelJointDef;
 import com.badlogic.gdx.utils.TimeUtils;
+
+import cross.utils.inputs.GestureHandler;
+import cross.utils.inputs.InputHandler;
+import cross.utils.primitives.Curve;
 
 public class Cross44 extends ApplicationAdapter
 {
@@ -50,11 +51,11 @@ public class Cross44 extends ApplicationAdapter
 	public static class Consts
 	{
 		public final static float SPEED = 225.0f;		
-		public static final int SCREEN_WIDTH = 1280;
-		public static final int SCREEN_HEIGHT = 780;
+		public static final int SCREEN_WIDTH = 1920;
+		public static final int SCREEN_HEIGHT = 1080;
 		public static final int CAMERA_WIDTH = 800;
 		public static final int CAMERA_HEIGHT = 480;
-		public static final int CAMERA_DISTANCE = 15;
+		public static final int CAMERA_DISTANCE = 5;
 		public static final boolean GRAVITY_ON = true;
 		public final static float TIME_STEP = 1.0f / 60.0f;
 		public final static int VELOCITY_ITERATIONS = 6;
@@ -162,54 +163,6 @@ public class Cross44 extends ApplicationAdapter
 			chassis.setAngularVelocity(0.0f);
 		}
 	}
-	
-	private void test_handleKeyBoardInput()
-	{
-		/*
-		boolean keyPressed = false;
-		if (Gdx.input.isKeyPressed(Keys.W) == true) // ACCELERATOR
-		{
-			leftWheel.enableMotor(true);
-			leftWheel.setMotorSpeed(-Consts.SPEED);
-			keyPressed = true;
-		}
-
-		if (Gdx.input.isKeyPressed(Keys.S) == true) // TURBO
-		{
-			chassis.setLinearVelocity(100.0f, chassis.getAngularVelocity());
-			leftBodyWheel.setLinearVelocity(100.0f, chassis.getAngularVelocity());
-			rightBodyWheel.setLinearVelocity(100.0f, chassis.getAngularVelocity());
-			keyPressed = true;
-		}
-
-		if (Gdx.input.isKeyPressed(Keys.UP) == true)
-		{
-			chassis.setAngularVelocity(3.0f);
-			keyPressed = true;
-		}
-
-		if (Gdx.input.isKeyPressed(Keys.DOWN) == true)
-		{
-			chassis.setAngularVelocity(-3.0f);
-			keyPressed = true;
-		}
-		
-		if (keyPressed == false) // BREAK
-		{
-			leftWheel.enableMotor(true);
-			leftWheel.setMotorSpeed(0.0f);
-			chassis.setAngularVelocity(0.0f);
-		}
-		
-		 */
-		if (Gdx.input.isKeyPressed(Keys.ESCAPE) == true)
-		{
-			Gdx.app.exit();
-			//keyPressed = true;
-		}
-
-		
-	}
 
 	private void test_createPhysicsGround()
 	{
@@ -236,7 +189,7 @@ public class Cross44 extends ApplicationAdapter
 
 		chain.dispose();
 		test_createPhysicsGroundLoop();
-		test_createPhysicsThings();
+		test_createPhysicsPiramid(350f, 50f, 25f);
 	}
 
 	private void test_createPhysicsGroundLoop()
@@ -244,8 +197,8 @@ public class Cross44 extends ApplicationAdapter
 		BodyDef bodyDef = new BodyDef();
 		Body edge = physicsWorld.createBody(bodyDef);
 
-		//ArrayList<Vector2> sides = Curve.generateCurve(new Vector2(100f, 200.0f), new Vector2(200f, 150.0f), 100.0f, 7.0f, false, false);
-		ArrayList<Vector2> sides = Curve.generateCurve(new Vector2(360f, 100.0f), new Vector2(400f, 75.0f), 80.0f, 7.0f, false, false);
+		//ArrayList<Vector2> sides = Curve.generateCurve(new Vector2(360f, 100.0f), new Vector2(400f, 75.0f), 80.0f, 7.0f, false, false);
+		ArrayList<Vector2> sides = Curve.generateCurve2();
 		ChainShape chain = new ChainShape();
 		chain.createChain(sides.toArray(new Vector2[sides.size()]));
 
@@ -259,17 +212,17 @@ public class Cross44 extends ApplicationAdapter
 		chain.dispose();
 	}
 
-	private void test_createPhysicsThings()
+	private void test_createPhysicsPiramid(float x, float y, float base)
 	{
 		BodyDef bodyDef = new BodyDef();
 		Body edge = physicsWorld.createBody(bodyDef);
 
 		ArrayList<Vector2> sides = new ArrayList<Vector2>();
 
-		sides.add(new Vector2(350.0f, 50.0f));
-		sides.add(new Vector2(375.0f, 75.0f));
-		sides.add(new Vector2(400.0f, 50.0f));
-		sides.add(new Vector2(350.0f, 50.0f));
+		sides.add(new Vector2(x, y));
+		sides.add(new Vector2(x+base, y+base));
+		sides.add(new Vector2(x+base+base, y));
+		sides.add(new Vector2(x, y));
 
 		ChainShape chain = new ChainShape();
 		chain.createChain(sides.toArray(new Vector2[sides.size()]));
@@ -292,9 +245,9 @@ public class Cross44 extends ApplicationAdapter
 		Vector2 sides[] = new Vector2[5];
 		int index = 0;
 		sides[index++] = new Vector2(0.0f, 0.0f);
-		sides[index++] = new Vector2(1280.0f, 0.0f);
-		sides[index++] = new Vector2(1280.0f, 720.0f);
-		sides[index++] = new Vector2(0.0f, 720.0f);
+		sides[index++] = new Vector2(Consts.SCREEN_WIDTH, 0.0f);
+		sides[index++] = new Vector2(Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT);
+		sides[index++] = new Vector2(0.0f, Consts.SCREEN_HEIGHT);
 		sides[index++] = new Vector2(0.0f, 0.0f);
 
 		ChainShape chain = new ChainShape();

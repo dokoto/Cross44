@@ -1,4 +1,4 @@
-package C44.utils.inputs;
+package cross.utils.inputs;
 
 import com.badlogic.gdx.input.GestureDetector.GestureListener;
 import com.badlogic.gdx.math.MathUtils;

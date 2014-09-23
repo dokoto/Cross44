@@ -1,4 +1,4 @@
-package C44.utils.inputs;
+package cross.utils.inputs;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
