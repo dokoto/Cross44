@@ -2,11 +2,13 @@ package cross;
 
 import java.util.ArrayList;
 
-import C44.utils.inputs.gestureHandler;
+import C44.utils.inputs.GestureHandler;
+import C44.utils.inputs.InputHandler;
 import C44.utils.primitives.Curve;
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
@@ -29,6 +31,7 @@ public class Cross44 extends ApplicationAdapter
 	
 	public enum Moves {ACCELERAR, TURBO, ESTABILIZA_ARRIBA, ESTABILIZA_ABAJO, CONTINUA_MOV, STOP};
 	public Moves currentMovement = Moves.STOP;
+	public float zoom = 1.0f;
 	public OrthographicCamera camera;
 	public World physicsWorld;
 	public Box2DDebugRenderer physicsDebugRenderer;
@@ -38,7 +41,10 @@ public class Cross44 extends ApplicationAdapter
 	public WheelJoint leftWheel, rightWheel;
 	private float accumulator = 0;
 	private double currentTime = 0;	
-
+	
+	private InputMultiplexer inputMultiplexer;
+    private InputHandler inputHandler;
+    private GestureHandler gestureHandler;
 
 	
 	public static class Consts
@@ -63,7 +69,13 @@ public class Cross44 extends ApplicationAdapter
 		physicsWorld = (Consts.GRAVITY_ON) ? new World(new Vector2(0, Consts.GRAVITY), true) : new World(new Vector2(0, 0.0f), true);		
 		physicsDebugRenderer = new Box2DDebugRenderer();
 		test_createPhysicsObjects();
-		Gdx.input.setInputProcessor(new gestureHandler(this));
+		
+		inputMultiplexer = new InputMultiplexer();
+		Gdx.input.setInputProcessor(inputMultiplexer);
+		inputHandler = new InputHandler(this);
+		gestureHandler = new GestureHandler(this);
+		inputMultiplexer.addProcessor(new GestureDetector(gestureHandler));
+        inputMultiplexer.addProcessor(inputHandler);
 	}
 
 	@Override
@@ -72,7 +84,6 @@ public class Cross44 extends ApplicationAdapter
 		camera.viewportWidth = Consts.SCREEN_WIDTH / Consts.CAMERA_DISTANCE;
 		camera.viewportHeight = Consts.SCREEN_HEIGHT / Consts.CAMERA_DISTANCE;
 	}
-
 	
 	private void doPhysicsStep(float deltaTime)
 	{
@@ -106,6 +117,7 @@ public class Cross44 extends ApplicationAdapter
 		physicsDebugRenderer.render(physicsWorld, camera.combined);
 		camera.position.x = chassis.getPosition().x;
 		camera.position.y = chassis.getPosition().y;
+		camera.zoom = zoom;
 		camera.update();
 		physicsWorld.step(Consts.TIME_STEP, Consts.VELOCITY_ITERATIONS, Consts.POSITION_ITERATIONS);
 		//doPhysicsStep(deltaTime);
