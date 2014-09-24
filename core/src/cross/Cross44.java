@@ -197,8 +197,7 @@ public class Cross44 extends ApplicationAdapter
 		BodyDef bodyDef = new BodyDef();
 		Body edge = physicsWorld.createBody(bodyDef);
 
-		//ArrayList<Vector2> sides = Curve.generateCurve(new Vector2(360f, 100.0f), new Vector2(400f, 75.0f), 80.0f, 7.0f, false, false);
-		ArrayList<Vector2> sides = Curve.generateCurve2();
+		ArrayList<Vector2> sides = Curve.generateCurve(new Vector2(360f, 100.0f), new Vector2(400f, 75.0f), 80.0f, 7.0f, false, false);
 		ChainShape chain = new ChainShape();
 		chain.createChain(sides.toArray(new Vector2[sides.size()]));
 

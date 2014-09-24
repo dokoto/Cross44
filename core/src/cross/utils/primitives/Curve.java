@@ -1,31 +1,20 @@
 package cross.utils.primitives;
 
-import java.awt.Shape;
-import java.awt.geom.AffineTransform;
-import java.awt.geom.Ellipse2D;
-import java.awt.geom.FlatteningPathIterator;
 import java.util.ArrayList;
 import java.util.List;
 
 import com.badlogic.gdx.math.Vector2;
 
+//http://www.tbray.org/ongoing/When/200x/2009/01/02/Android-Draw-a-Curved-Line
+//http://java-sl.com/tip_flatteningpathiterator_moving_shape.html
+//http://blog.mwrobel.eu/howt-draw-semicircle-android-canvasenhow-draw-semicircle-android-canvas/
+// ****************
+// https://code.google.com/p/box2d-editor/
+// http://www.deluge.co/?q=inkscape-paths
+//****************
+
 public class Curve
 {
-	// http://java-sl.com/tip_flatteningpathiterator_moving_shape.html
-	public static ArrayList<Vector2> generateCurve2()
-	{
-		ArrayList<Vector2> curve = new ArrayList<Vector2>();
-		Shape s = new Ellipse2D.Float(100, 55, 100, 100);
-		FlatteningPathIterator iter = new FlatteningPathIterator(s.getPathIterator(new AffineTransform()), 1);
-		float[] coords=new float[6];
-		while (!iter.isDone())
-		{
-			iter.currentSegment(coords);
-			curve.add(new Vector2((int)coords[0], (int)coords[1]));
-		}
-		
-		return curve;
-	}
 	
 	public static ArrayList<Vector2> generateCurve(Vector2 from, Vector2 to, float radius, float minDistance, boolean shortest, boolean side)
 	{
