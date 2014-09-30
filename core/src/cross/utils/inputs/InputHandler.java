@@ -24,30 +24,30 @@ public class InputHandler implements InputProcessor
 			Gdx.app.log("KEY-DOWN", "ACELERANDO");
 			cross.currentMovement = Cross44.Moves.ACCELERAR;
 		}
-		
+
 		if (Keys.S == keycode)
 		{
 			Gdx.app.log("KEY-DOWN", "TURBO");
 			cross.currentMovement = Cross44.Moves.TURBO;
 		}
-		
+
 		if (Keys.UP == keycode)
 		{
 			Gdx.app.log("KEY-DOWN", "ESTABILIZA_ARRIBA");
 			cross.currentMovement = Cross44.Moves.ESTABILIZA_ARRIBA;
 		}
-		
+
 		if (Keys.DOWN == keycode)
 		{
 			Gdx.app.log("KEY-DOWN", "ESTABILIZA_ABAJO");
 			cross.currentMovement = Cross44.Moves.ESTABILIZA_ABAJO;
 		}
-		
+
 		if (Keys.ESCAPE == keycode)
 		{
 			Gdx.app.exit();
 		}
-		
+
 		return false;
 	}
 
@@ -56,28 +56,24 @@ public class InputHandler implements InputProcessor
 	{
 		if (Keys.W == keycode)
 		{
-			Gdx.app.log("KEY-DOWN", "STOP-ACELERANDO");
 			cross.currentMovement = Cross44.Moves.STOP;
 		}
-		
+
 		if (Keys.S == keycode)
 		{
-			Gdx.app.log("KEY-DOWN", "STOP-TURBO");
-			//cross.currentMovement = Cross44.Moves.STOP;
+			cross.currentMovement = Cross44.Moves.STOP;
 		}
-		
+
 		if (Keys.UP == keycode)
 		{
-			Gdx.app.log("KEY-DOWN", "STOP-ESTABILIZA_ARRIBA");
-			cross.currentMovement = Cross44.Moves.STOP;
+			cross.currentMovement = Cross44.Moves.STOP_ESTABILIZA;
 		}
-		
+
 		if (Keys.DOWN == keycode)
 		{
-			Gdx.app.log("KEY-DOWN", "STOP-ESTABILIZA_ABAJO");
-			cross.currentMovement = Cross44.Moves.STOP;
+			cross.currentMovement = Cross44.Moves.STOP_ESTABILIZA;
 		}
-		
+
 		return false;
 	}
 

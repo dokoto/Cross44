@@ -33,7 +33,7 @@ public class Cross44 extends ApplicationAdapter
 
 	public enum Moves
 	{
-		ACCELERAR, TURBO, ESTABILIZA_ARRIBA, ESTABILIZA_ABAJO, CONTINUA_MOV, STOP
+		ACCELERAR, TURBO, ESTABILIZA_ARRIBA, ESTABILIZA_ABAJO, CONTINUA_MOV, STOP, STOP_ESTABILIZA
 	};
 
 	public Moves currentMovement = Moves.STOP;
@@ -56,15 +56,14 @@ public class Cross44 extends ApplicationAdapter
 	{
 		public static final int SCREEN_WIDTH = 100;
 		public static final int SCREEN_HEIGHT = 100;
-		
+
 		public static final int WORLD_BUNDARIE_WIDTH = 1000;
 		public static final int WORLD_BUNDARIE_HEIGHT = 600;
-		
+
 		public static final int PLAYER_POS_X = 10;
-		public static final int PLAYER_POS_Y = 10;
-		
-		
-		public final static float SPEED = 225.0f;						
+		public static final int PLAYER_POS_Y = 20;
+
+		public final static float SPEED = 225.0f;
 		public static final int SCREEN_WIDTH_PX = 1280;
 		public static final int SCREEN_HEIGHT_PX = 780;
 		public static final int CAMERA_WIDTH_PX = 800;
@@ -82,19 +81,19 @@ public class Cross44 extends ApplicationAdapter
 	{
 		cameraInit();
 		physicsWorld = (Consts.GRAVITY_ON) ? new World(new Vector2(0, Consts.GRAVITY), true) : new World(new Vector2(0, 0.0f), true);
-		
+
 		physicsDebugRenderer = new Box2DDebugRenderer();
-		
+
 		test_createPhysicsObjects();
 		createInputHabdler();
-		
+		currentMovement = Moves.STOP;
+
 	}
-	
-	
+
 	@Override
 	public void render()
 	{
-		//float deltaTime = getDeltaTime();
+		// float deltaTime = getDeltaTime();
 		Gdx.gl.glClearColor(0, 0, 0, 0);
 		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
 		// test_handleKeyBoardInput();
@@ -104,44 +103,42 @@ public class Cross44 extends ApplicationAdapter
 		cameraRender();
 		// doPhysicsStep(deltaTime);
 	}
-	
-	
+
 	private void cameraInit()
 	{
-		float w = Gdx.graphics.getWidth();                                       
-        float h = Gdx.graphics.getHeight();                                      
-        camera = new OrthographicCamera(Consts.CAMERA_DISTANCE, Consts.CAMERA_DISTANCE * (h / w));                          
-        camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
-        camera.update(); 
+		float w = Gdx.graphics.getWidth();
+		float h = Gdx.graphics.getHeight();
+		camera = new OrthographicCamera(Consts.CAMERA_DISTANCE, Consts.CAMERA_DISTANCE * (h / w));
+		camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
+		camera.update();
 	}
-	
-	private void cameraRender()
-	{		
 
-		camera.position.x = (camera.viewportWidth / 2f) + ( (chassis.getPosition().x <=Consts.PLAYER_POS_X) ? 0.0f : Math.abs(Consts.PLAYER_POS_X-chassis.getPosition().x) );			
-		camera.position.y = (camera.viewportHeight / 2f) + ( (chassis.getPosition().y <=Consts.PLAYER_POS_Y) ? 0.0f : Math.abs(Consts.PLAYER_POS_Y-chassis.getPosition().y) );
+	private void cameraRender()
+	{
+
+		camera.position.x = (camera.viewportWidth / 2f) + ((chassis.getPosition().x <= Consts.PLAYER_POS_X) ? 0.0f : Math.abs(Consts.PLAYER_POS_X - chassis.getPosition().x));
+		camera.position.y = (camera.viewportHeight / 2f) + ((chassis.getPosition().y <= Consts.PLAYER_POS_Y) ? 0.0f : Math.abs(Consts.PLAYER_POS_Y - chassis.getPosition().y));
 		camera.zoom = zoom;
 
-        camera.update();
+		camera.update();
 	}
-	
-	
+
 	private void createInputHabdler()
 	{
 		inputMultiplexer = new InputMultiplexer();
 		Gdx.input.setInputProcessor(inputMultiplexer);
 		inputHandler = new InputHandler(this);
-		//gestureHandler = new GestureHandler(this);
-		//inputMultiplexer.addProcessor(new GestureDetector(gestureHandler));
+		gestureHandler = new GestureHandler(this);
+		inputMultiplexer.addProcessor(new GestureDetector(gestureHandler));
 		inputMultiplexer.addProcessor(inputHandler);
 	}
 
 	@Override
 	public void resize(int width, int height)
-	{		
-		camera.viewportWidth = Consts.CAMERA_DISTANCE;                 
-		camera.viewportHeight = Consts.CAMERA_DISTANCE * height/width; 
-		camera.update();		
+	{
+		camera.viewportWidth = Consts.CAMERA_DISTANCE;
+		camera.viewportHeight = Consts.CAMERA_DISTANCE * height / width;
+		camera.update();
 	}
 
 	private void doPhysicsStep(float deltaTime)
@@ -168,9 +165,9 @@ public class Cross44 extends ApplicationAdapter
 	private void test_createPhysicsObjects()
 	{
 		test_createPhysicsWorldBundaries();
-		//test_createPhysicsGround();
-		//test_createPhysicsGroundLoop();
-		//test_createPhysicsPiramid(60f, 2.5f, 10f);
+		// test_createPhysicsGround();
+		// test_createPhysicsGroundLoop();
+		// test_createPhysicsPiramid(60f, 2.5f, 10f);
 		test_createPhysicsPlayer(Consts.PLAYER_POS_X, Consts.PLAYER_POS_Y);
 
 		test_createFromLoader();
@@ -181,11 +178,13 @@ public class Cross44 extends ApplicationAdapter
 		if (movement == Moves.ACCELERAR)
 		{
 			leftWheel.enableMotor(true);
-			leftWheel.setMotorSpeed(-Consts.SPEED);			
+			leftWheel.setMotorSpeed(-Consts.SPEED);
 		}
 
 		if (movement == Moves.TURBO)
 		{
+			leftWheel.enableMotor(true);
+			leftWheel.setMotorSpeed(-Consts.SPEED);
 			chassis.setLinearVelocity(100.0f, chassis.getAngularVelocity());
 			leftBodyWheel.setLinearVelocity(100.0f, chassis.getAngularVelocity());
 			rightBodyWheel.setLinearVelocity(100.0f, chassis.getAngularVelocity());
@@ -201,12 +200,18 @@ public class Cross44 extends ApplicationAdapter
 			chassis.setAngularVelocity(-3.0f);
 		}
 
+		if (movement == Moves.STOP_ESTABILIZA)
+		{
+			chassis.setAngularVelocity(0.0f);
+		}
+
 		if (movement == Moves.STOP)
 		{
 			leftWheel.enableMotor(true);
 			leftWheel.setMotorSpeed(0.0f);
-			chassis.setAngularVelocity(0.0f);
+
 		}
+
 	}
 
 	private void test_createPhysicsGround()
@@ -232,7 +237,7 @@ public class Cross44 extends ApplicationAdapter
 
 		edge.createFixture(fixtureDef);
 
-		chain.dispose();		
+		chain.dispose();
 	}
 
 	private void test_createFromLoader()
@@ -241,10 +246,10 @@ public class Cross44 extends ApplicationAdapter
 		// 1. Create a BodyDef, as usual.
 		BodyDef bd = new BodyDef();
 		bd.position.set(20f, 0.1f);
-		//bd.type = BodyType.DynamicBody;
+		// bd.type = BodyType.DynamicBody;
 
 		// 2. Create a FixtureDef, as usual.
-		FixtureDef fd = new FixtureDef();		
+		FixtureDef fd = new FixtureDef();
 		fd.density = 1000.5f;
 		fd.friction = 100.0f;
 
