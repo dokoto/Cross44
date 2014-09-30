@@ -63,7 +63,7 @@ public class InputHandler implements InputProcessor
 		if (Keys.S == keycode)
 		{
 			Gdx.app.log("KEY-DOWN", "STOP-TURBO");
-			cross.currentMovement = Cross44.Moves.STOP;
+			//cross.currentMovement = Cross44.Moves.STOP;
 		}
 		
 		if (Keys.UP == keycode)

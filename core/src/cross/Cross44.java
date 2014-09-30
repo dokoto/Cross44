@@ -8,6 +8,7 @@ import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.input.GestureDetector;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -27,9 +28,11 @@ import cross.utils.inputs.InputHandler;
 import cross.utils.inputs.loaders.BodyEditorLoader;
 import cross.utils.primitives.Curve;
 
-public class Cross44 extends ApplicationAdapter {
+public class Cross44 extends ApplicationAdapter
+{
 
-	public enum Moves {
+	public enum Moves
+	{
 		ACCELERAR, TURBO, ESTABILIZA_ARRIBA, ESTABILIZA_ABAJO, CONTINUA_MOV, STOP
 	};
 
@@ -49,13 +52,24 @@ public class Cross44 extends ApplicationAdapter {
 	private InputHandler inputHandler;
 	private GestureHandler gestureHandler;
 
-	public static class Consts {
-		public final static float SPEED = 225.0f;
-		public static final int SCREEN_WIDTH = 1920;
-		public static final int SCREEN_HEIGHT = 1080;
-		public static final int CAMERA_WIDTH = 800;
-		public static final int CAMERA_HEIGHT = 480;
-		public static final int CAMERA_DISTANCE = 5;
+	public static class Consts
+	{
+		public static final int SCREEN_WIDTH = 100;
+		public static final int SCREEN_HEIGHT = 100;
+		
+		public static final int WORLD_BUNDARIE_WIDTH = 1000;
+		public static final int WORLD_BUNDARIE_HEIGHT = 600;
+		
+		public static final int PLAYER_POS_X = 10;
+		public static final int PLAYER_POS_Y = 10;
+		
+		
+		public final static float SPEED = 225.0f;						
+		public static final int SCREEN_WIDTH_PX = 1280;
+		public static final int SCREEN_HEIGHT_PX = 780;
+		public static final int CAMERA_WIDTH_PX = 800;
+		public static final int CAMERA_HEIGHT_PX = 480;
+		public static final int CAMERA_DISTANCE = 90;
 		public static final boolean GRAVITY_ON = true;
 		public final static float TIME_STEP = 1.0f / 60.0f;
 		public final static int VELOCITY_ITERATIONS = 6;
@@ -64,113 +78,149 @@ public class Cross44 extends ApplicationAdapter {
 	}
 
 	@Override
-	public void create() {
-		camera = new OrthographicCamera(Gdx.graphics.getWidth()
-				/ Consts.CAMERA_DISTANCE, Gdx.graphics.getHeight()
-				/ Consts.CAMERA_DISTANCE);
-		physicsWorld = (Consts.GRAVITY_ON) ? new World(new Vector2(0,
-				Consts.GRAVITY), true) : new World(new Vector2(0, 0.0f), true);
+	public void create()
+	{
+		cameraInit();
+		physicsWorld = (Consts.GRAVITY_ON) ? new World(new Vector2(0, Consts.GRAVITY), true) : new World(new Vector2(0, 0.0f), true);
+		
 		physicsDebugRenderer = new Box2DDebugRenderer();
+		
 		test_createPhysicsObjects();
+		createInputHabdler();
+		
+	}
+	
+	
+	@Override
+	public void render()
+	{
+		//float deltaTime = getDeltaTime();
+		Gdx.gl.glClearColor(0, 0, 0, 0);
+		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
+		// test_handleKeyBoardInput();
+		test_handleMovement(currentMovement);
+		physicsDebugRenderer.render(physicsWorld, camera.combined);
+		physicsWorld.step(Consts.TIME_STEP, Consts.VELOCITY_ITERATIONS, Consts.POSITION_ITERATIONS);
+		cameraRender();
+		// doPhysicsStep(deltaTime);
+	}
+	
+	
+	private void cameraInit()
+	{
+		float w = Gdx.graphics.getWidth();                                       
+        float h = Gdx.graphics.getHeight();                                      
+        camera = new OrthographicCamera(Consts.CAMERA_DISTANCE, Consts.CAMERA_DISTANCE * (h / w));                          
+        camera.position.set(camera.viewportWidth / 2f, camera.viewportHeight / 2f, 0);
+        camera.update(); 
+	}
+	
+	private void cameraRender()
+	{		
 
+		camera.position.x = (camera.viewportWidth / 2f) + ( (chassis.getPosition().x <=Consts.PLAYER_POS_X) ? 0.0f : Math.abs(Consts.PLAYER_POS_X-chassis.getPosition().x) );			
+		camera.position.y = (camera.viewportHeight / 2f) + ( (chassis.getPosition().y <=Consts.PLAYER_POS_Y) ? 0.0f : Math.abs(Consts.PLAYER_POS_Y-chassis.getPosition().y) );
+		camera.zoom = zoom;
+
+        camera.update();
+	}
+	
+	
+	private void createInputHabdler()
+	{
 		inputMultiplexer = new InputMultiplexer();
 		Gdx.input.setInputProcessor(inputMultiplexer);
 		inputHandler = new InputHandler(this);
-		gestureHandler = new GestureHandler(this);
-		inputMultiplexer.addProcessor(new GestureDetector(gestureHandler));
+		//gestureHandler = new GestureHandler(this);
+		//inputMultiplexer.addProcessor(new GestureDetector(gestureHandler));
 		inputMultiplexer.addProcessor(inputHandler);
 	}
 
 	@Override
-	public void resize(int width, int height) {
-		camera.viewportWidth = Consts.SCREEN_WIDTH / Consts.CAMERA_DISTANCE;
-		camera.viewportHeight = Consts.SCREEN_HEIGHT / Consts.CAMERA_DISTANCE;
+	public void resize(int width, int height)
+	{		
+		camera.viewportWidth = Consts.CAMERA_DISTANCE;                 
+		camera.viewportHeight = Consts.CAMERA_DISTANCE * height/width; 
+		camera.update();		
 	}
 
-	private void doPhysicsStep(float deltaTime) {
+	private void doPhysicsStep(float deltaTime)
+	{
 		// fixed time step
 		// max frame time to avoid spiral of death (on slow devices)
 		float frameTime = Math.min(deltaTime, 0.25f);
 		accumulator += frameTime;
-		while (accumulator >= Consts.TIME_STEP) {
-			physicsWorld.step(Consts.TIME_STEP, Consts.VELOCITY_ITERATIONS,
-					Consts.POSITION_ITERATIONS);
+		while (accumulator >= Consts.TIME_STEP)
+		{
+			physicsWorld.step(Consts.TIME_STEP, Consts.VELOCITY_ITERATIONS, Consts.POSITION_ITERATIONS);
 			accumulator -= Consts.TIME_STEP;
 		}
 	}
 
-	private float getDeltaTime() {
+	private float getDeltaTime()
+	{
 		double newTime = TimeUtils.millis() / 1000.0;
 		double frameTime = Math.min(newTime - currentTime, 0.25);
 		currentTime = newTime;
 		return (float) frameTime;
 	}
 
-	@Override
-	public void render() {
-		float deltaTime = getDeltaTime();
-		Gdx.gl.glClearColor(0, 0, 0, 0);
-		Gdx.gl.glClear(GL20.GL_COLOR_BUFFER_BIT);
-		// test_handleKeyBoardInput();
-		test_handleMovement(currentMovement);
-		physicsDebugRenderer.render(physicsWorld, camera.combined);
-		camera.position.x = chassis.getPosition().x;
-		camera.position.y = chassis.getPosition().y;
-		camera.zoom = zoom;
-		camera.update();
-		physicsWorld.step(Consts.TIME_STEP, Consts.VELOCITY_ITERATIONS,
-				Consts.POSITION_ITERATIONS);
-		// doPhysicsStep(deltaTime);
-	}
-
-	private void test_createPhysicsObjects() {
+	private void test_createPhysicsObjects()
+	{
 		test_createPhysicsWorldBundaries();
-		test_createPhysicsGround();
-		test_createPhysicsPlayer(10.0f, 55.0f);
+		//test_createPhysicsGround();
+		//test_createPhysicsGroundLoop();
+		//test_createPhysicsPiramid(60f, 2.5f, 10f);
+		test_createPhysicsPlayer(Consts.PLAYER_POS_X, Consts.PLAYER_POS_Y);
 
 		test_createFromLoader();
 	}
 
-	private void test_handleMovement(Moves movement) {
-		if (movement == Moves.ACCELERAR) {
+	private void test_handleMovement(Moves movement)
+	{
+		if (movement == Moves.ACCELERAR)
+		{
 			leftWheel.enableMotor(true);
-			leftWheel.setMotorSpeed(-Consts.SPEED);
+			leftWheel.setMotorSpeed(-Consts.SPEED);			
 		}
 
-		if (movement == Moves.TURBO) {
+		if (movement == Moves.TURBO)
+		{
 			chassis.setLinearVelocity(100.0f, chassis.getAngularVelocity());
-			leftBodyWheel.setLinearVelocity(100.0f,
-					chassis.getAngularVelocity());
-			rightBodyWheel.setLinearVelocity(100.0f,
-					chassis.getAngularVelocity());
+			leftBodyWheel.setLinearVelocity(100.0f, chassis.getAngularVelocity());
+			rightBodyWheel.setLinearVelocity(100.0f, chassis.getAngularVelocity());
 		}
 
-		if (movement == Moves.ESTABILIZA_ARRIBA) {
+		if (movement == Moves.ESTABILIZA_ARRIBA)
+		{
 			chassis.setAngularVelocity(3.0f);
 		}
 
-		if (movement == Moves.ESTABILIZA_ABAJO) {
+		if (movement == Moves.ESTABILIZA_ABAJO)
+		{
 			chassis.setAngularVelocity(-3.0f);
 		}
 
-		if (movement == Moves.STOP) {
+		if (movement == Moves.STOP)
+		{
 			leftWheel.enableMotor(true);
 			leftWheel.setMotorSpeed(0.0f);
 			chassis.setAngularVelocity(0.0f);
 		}
 	}
 
-	private void test_createPhysicsGround() {
+	private void test_createPhysicsGround()
+	{
 		BodyDef bodyDef = new BodyDef();
 		Body edge = physicsWorld.createBody(bodyDef);
 
 		ArrayList<Vector2> sides = new ArrayList<Vector2>();
 
-		sides.add(new Vector2(0.0f, 50.0f));
-		sides.add(new Vector2(150.0f, 50.0f));
-		sides.add(new Vector2(390.0f, 52.0f));
-		sides.add(new Vector2(600.0f, 25.0f));
-		sides.add(new Vector2(1200.0f, 50.0f));
+		sides.add(new Vector2(0.0f, 2.5f));
+		sides.add(new Vector2(150.0f, 2.5f));
+		sides.add(new Vector2(390.0f, 3.5f));
+		sides.add(new Vector2(600.0f, 1.25f));
+		sides.add(new Vector2(1200.0f, 2.5f));
 
 		ChainShape chain = new ChainShape();
 		chain.createChain(sides.toArray(new Vector2[sides.size()]));
@@ -182,39 +232,35 @@ public class Cross44 extends ApplicationAdapter {
 
 		edge.createFixture(fixtureDef);
 
-		chain.dispose();
-		test_createPhysicsGroundLoop();
-		test_createPhysicsPiramid(350f, 50f, 25f);
+		chain.dispose();		
 	}
 
-	private void test_createFromLoader() {
-		BodyEditorLoader loader = new cross.utils.inputs.loaders.BodyEditorLoader(
-				Gdx.files.internal("data/level_test.json"));
+	private void test_createFromLoader()
+	{
+		BodyEditorLoader loader = new cross.utils.inputs.loaders.BodyEditorLoader(Gdx.files.internal("data/level_test.json"));
 		// 1. Create a BodyDef, as usual.
 		BodyDef bd = new BodyDef();
-		bd.position.set(100, 200);
-		bd.type = BodyType.DynamicBody;
+		bd.position.set(20f, 0.1f);
+		//bd.type = BodyType.DynamicBody;
 
 		// 2. Create a FixtureDef, as usual.
-		FixtureDef fd = new FixtureDef();
-		fd.density = 1;
-		fd.friction = 0.5f;
-		fd.restitution = 0.3f;
+		FixtureDef fd = new FixtureDef();		
+		fd.density = 1000.5f;
+		fd.friction = 100.0f;
 
 		// 3. Create a Body, as usual.
 		testBodyFromLoader = physicsWorld.createBody(bd);
 
 		// 4. Create the body fixture automatically by using the loader.
-		loader.attachFixture(testBodyFromLoader, "ground", fd, 60);
+		loader.attachFixture(testBodyFromLoader, "ground", fd, 160);
 	}
 
-	private void test_createPhysicsGroundLoop() {
+	private void test_createPhysicsGroundLoop()
+	{
 		BodyDef bodyDef = new BodyDef();
 		Body edge = physicsWorld.createBody(bodyDef);
 
-		ArrayList<Vector2> sides = Curve.generateCurve(
-				new Vector2(360f, 100.0f), new Vector2(400f, 75.0f), 80.0f,
-				7.0f, false, false);
+		ArrayList<Vector2> sides = Curve.generateCurve(new Vector2(160f, 26.0f), new Vector2(200f, 3.0f), 40.0f, 7.0f, false, false);
 		ChainShape chain = new ChainShape();
 		chain.createChain(sides.toArray(new Vector2[sides.size()]));
 
@@ -228,7 +274,8 @@ public class Cross44 extends ApplicationAdapter {
 		chain.dispose();
 	}
 
-	private void test_createPhysicsPiramid(float x, float y, float base) {
+	private void test_createPhysicsPiramid(float x, float y, float base)
+	{
 		BodyDef bodyDef = new BodyDef();
 		Body edge = physicsWorld.createBody(bodyDef);
 
@@ -252,16 +299,17 @@ public class Cross44 extends ApplicationAdapter {
 		chain.dispose();
 	}
 
-	private void test_createPhysicsWorldBundaries() {
+	private void test_createPhysicsWorldBundaries()
+	{
 		BodyDef bodyDef = new BodyDef();
 		Body edge = physicsWorld.createBody(bodyDef);
 
 		Vector2 sides[] = new Vector2[5];
 		int index = 0;
 		sides[index++] = new Vector2(0.0f, 0.0f);
-		sides[index++] = new Vector2(Consts.SCREEN_WIDTH, 0.0f);
-		sides[index++] = new Vector2(Consts.SCREEN_WIDTH, Consts.SCREEN_HEIGHT);
-		sides[index++] = new Vector2(0.0f, Consts.SCREEN_HEIGHT);
+		sides[index++] = new Vector2(Consts.WORLD_BUNDARIE_WIDTH, 0.0f);
+		sides[index++] = new Vector2(Consts.WORLD_BUNDARIE_WIDTH, Consts.WORLD_BUNDARIE_HEIGHT);
+		sides[index++] = new Vector2(0.0f, Consts.WORLD_BUNDARIE_HEIGHT);
 		sides[index++] = new Vector2(0.0f, 0.0f);
 
 		ChainShape chain = new ChainShape();
@@ -275,30 +323,30 @@ public class Cross44 extends ApplicationAdapter {
 		chain.dispose();
 	}
 
-	private void test_createPhysicsPlayer() {
+	private void test_createPhysicsPlayer()
+	{
 		final float DEFAULT_X_POS = 100.0f;
 		final float DEFAULT_Y_POS = 12.0f;
 		test_createPhysicsPlayer(DEFAULT_X_POS, DEFAULT_Y_POS);
 	}
 
-	private void test_createPhysicsPlayer(float x_pos, float y_pos) {
+	private void test_createPhysicsPlayer(float x_pos, float y_pos)
+	{
 		final float DEFAULT_RADIUS = 10.4f;
 		final float DEFAULT_FRAME_WIDTH = 3.0f;
 		final float DEFAULT_FRAME_HEIGHT = 1.5f;
-		test_createPhysicsPlayer(x_pos, y_pos, DEFAULT_RADIUS,
-				DEFAULT_FRAME_WIDTH, DEFAULT_FRAME_HEIGHT);
+		test_createPhysicsPlayer(x_pos, y_pos, DEFAULT_RADIUS, DEFAULT_FRAME_WIDTH, DEFAULT_FRAME_HEIGHT);
 	}
 
-	private void test_createPhysicsPlayer(float x_pos, float y_pos,
-			float radius, float frame_width, float frame_height) {
+	private void test_createPhysicsPlayer(float x_pos, float y_pos, float radius, float frame_width, float frame_height)
+	{
 		BodyDef bodyDef = new BodyDef();
 		bodyDef.type = BodyType.DynamicBody;
 		bodyDef.position.set(x_pos, y_pos);
 
 		// CHASSIS
 		PolygonShape chassisShape = new PolygonShape();
-		chassisShape.set(new float[] { 2.0f, 2.0f, 4.2f, -2.2f, -1.0f, -2.0f,
-				-4.2f, -2.2f, -2.0f, 0.9f });
+		chassisShape.set(new float[] { 2.0f, 2.0f, 4.2f, -2.2f, -1.0f, -2.0f, -4.2f, -2.2f, -2.0f, 0.9f });
 
 		chassisFixtureDef = new FixtureDef();
 		chassisFixtureDef.density = 20.0f;
